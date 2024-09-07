@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   // res.send("register");
@@ -26,28 +27,44 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { username, password } = req.body;
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: { username },
-    });
+  const user = await prisma.user.findUnique({
+    where: { username },
+  });
 
-    // console.log(user);
-    if (!user) {
-      return res.status(401).json({ message: "invalid user" });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid)
-      return res.status(401).json({ message: "invaillid credentials" });
-
-    res
-      .cookie("cokkieName", username, { maxAge: 900000, httpOnly: true })
-      .json("successfully");
-    // res.setHeader("Set-Cookies", "test=" + "myvalue").json("successfully");
-  } catch (error) {
-    res.status(500).json({ message: "failed to login" });
+  if (!user) {
+    return res.json({ message: "invalid user" });
   }
+
+  const isValidPass = await bcrypt.compare(password, user.password);
+
+  if (!isValidPass) {
+    return res.json({ message: "invalid userjname and password" });
+  }
+
+  const token = jwt.sign(
+    {
+      time: Date(),
+      userId: user.id,
+      isAdmin: true,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+  const { email, id } = user;
+
+  return res
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    })
+    .status(200)
+    .json({
+      message: "logged in successfully",
+      status: true,
+      user: { id, username, email },
+    });
 };
 
-export const logout = (req, res) => {};
+export const logout = (req, res) => {
+  res.clearCookie("token").status(200).json({ message: "Logout Successful" });
+};

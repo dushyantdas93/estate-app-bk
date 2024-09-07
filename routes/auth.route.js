@@ -9,7 +9,7 @@ router.post("/register", register);
 router.post("/read", register);
 
 
-router.post("/login", login);
+router.post("/login",login);
 
 router.post("/logout", logout);
 
