@@ -60,9 +60,10 @@ export const login = async (req, res) => {
     .status(200)
     .json({
       message: "logged in successfully",
+      token: token,
       status: true,
       user: { id, username, email },
-    });
+    }).send
 };
 
 export const logout = (req, res) => {

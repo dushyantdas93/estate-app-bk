@@ -2,12 +2,13 @@ import express from "express";
 import cors from "cors";
 import authRoute from "./routes/auth.route.js";
 import testRoute from "./routes/test.route.js";
+import userRoute from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(cookieParser())
+app.use(cookieParser());
 
 app.use(express.json());
 app.get("/", function (req, res) {
@@ -19,6 +20,7 @@ app.get("/", function (req, res) {
 });
 app.use("/server/auth", authRoute);
 app.use("/server/test", testRoute);
+app.use("/server/user", userRoute);
 app.use("/server/test", (req, res) => {
   res.send("its work");
 });
