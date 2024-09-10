@@ -6,6 +6,7 @@ export const register = async (req, res) => {
   // res.send("register");
   try {
     const { username, email, password } = req.body;
+    console.log(username);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -67,5 +68,6 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
+  console.log("dfjasfjsdlafj")
   res.clearCookie("token").status(200).json({ message: "Logout Successful" });
 };
